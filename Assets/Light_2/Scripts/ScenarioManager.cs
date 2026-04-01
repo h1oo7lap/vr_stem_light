@@ -6,35 +6,27 @@ using UnityEngine.Events;
 public class ScenarioManager : MonoBehaviour
 {
     [Header("UI References")]
-    [Tooltip("Kéo TextMeshPro UI hiển thị bảng chỉ dẫn vào đây")]
     public TMP_Text menuBoardText;
 
     [Header("Dependencies")]
-    [Tooltip("Kéo Cây Laser chiếu Khúc Xạ vào đây để hệ thống theo dõi chiết suất môi trường")]
     public LightBeamPhysics mainLaser;
-
-    [Tooltip("Kéo object chứa Script OpticVisualAids của cây Laser vào đây")]
     public OpticVisualAids opticVisualAids;
-
-    [Tooltip("Kéo Bể Nước (Water Tank) vào đây để check bài thay đổi chiết suất")]
     public RefractiveMaterial targetWaterTank;
-
-    [Tooltip("Kéo cây Laser dùng cho Lăng Kính vào (để check cầu vồng đập vào bảng)")]
     public LightBeamPhysics dispersionPrismLaser;
 
-    [Header("Audio (Lồng tiếng / Thông báo)")]
-    [Tooltip("Kéo AudioSource dùng để phát âm thanh vào đây")]
+    [Header("Audio (Lồng tiếng)")]
     public AudioSource scenarioAudioSource;
 
-    [Tooltip("Danh sách 10 file âm thanh tương ứng với 10 Case trong switch(currentStep)")]
-    public AudioClip[] stepClips;
-
-    [Header("Dynamic Objects (Tự động Hiện/Ẩn)")]
-    [Tooltip("Lắp Nút bấm đổi chiết suất (hoặc Canvas chứa nút) vào đây để nó tàng hình ở Vòng 1")]
+    [Header("Dynamic Objects")]
     public GameObject indexButtonPanel;
-
-    [Tooltip("Lắp Bản thể Lăng Kính (Prism) vào đâyt")]
     public GameObject prismObject;
+
+    [Header("Images")]
+    public MeshRenderer image;
+    public Texture[] stepTextures;
+
+    [Tooltip("Sounds.")]
+    public AudioClip[] stepClips;
 
     [Header("Events")]
     public UnityEvent onStepCompleted;
@@ -43,11 +35,6 @@ public class ScenarioManager : MonoBehaviour
     [Header("Runtime State")]
     [Range(0, 9)]
     public int currentStep = 0;
-
-    // Thời gian chờ cho mỗi bước (tính bằng giây).
-    // Các bước bằng 0 là các bước Thử thách (cần bắt thao tác tay của người học thay vì chờ giờ)
-    // 0: Chào -> 1: Hỏi khúc xạ -> 2: Giải thích khúc xạ -> 3: Task Khúc xạ -> 4: Task Phản xạ toàn phần (TIR) -> 5: Giải thích TIR -> 6: Hỏi cầu vồng -> 7: Giải thích tán sắc -> 8: Task Tán sắc -> 9: Kết thúc
-    private float[] stepDurations = { 7f, 7f, 8f, 0f, 0f, 9f, 6f, 9f, 0f, 0f };
 
     private Coroutine autoAdvanceCoroutine;
     private bool isWaitingToAdvance = false;
@@ -78,39 +65,42 @@ public class ScenarioManager : MonoBehaviour
         }
     }
 
-    // Tự động kiểm tra điều kiện hoàn thành thử thách
+    // Kiểm tra hoàn thành THỬ THÁCH (Thao tác tay)
     void CheckAutoProgress()
     {
-        if (currentStep == 3) // THỬ THÁCH 1 – KHÚC XẠ: góc 35-40
+        // Chỉ kiểm tra khi KHÔNG trong trạng thái chờ nhảy bước tự động
+        if (isWaitingToAdvance)
+            return;
+
+        if (currentStep == 3) // THỬ THÁCH 1: Khúc xạ
         {
-            if (opticVisualAids != null && !opticVisualAids.isTIR)
+            if (
+                opticVisualAids != null
+                && opticVisualAids.currentAngleR >= 35f
+                && opticVisualAids.currentAngleR <= 40f
+            )
             {
-                if (opticVisualAids.currentAngleR >= 35f && opticVisualAids.currentAngleR <= 40f)
-                {
-                    AdvanceStepWithDelay(2f); // Delay 2s để học sinh có thời gian "Ngắm" lại thành quả
-                }
+                AdvanceStepWithDelay(1.5f);
             }
         }
-        else if (currentStep == 4) // THAY ĐỔI CHIẾT SUẤT MÔI TRƯỜNG + THỬ NGHIỆM TIR
+        else if (currentStep == 4) // THỬ THÁCH 2: TIR
         {
-            // Kiểm tra xem đã tăng n Môi Trường > n Nước (tạo điều kiện ngược TIR)
             if (mainLaser != null && targetWaterTank != null)
             {
-                if (mainLaser.environmentRefractiveIndex > targetWaterTank.refractiveIndex)
+                if (
+                    mainLaser.environmentRefractiveIndex > targetWaterTank.refractiveIndex
+                    && opticVisualAids.isTIR
+                )
                 {
-                    if (opticVisualAids != null && opticVisualAids.isTIR)
-                    {
-                        AdvanceStepWithDelay(3f);
-                    }
+                    AdvanceStepWithDelay(2f);
                 }
             }
         }
-        else if (currentStep == 8) // THỰC HÀNH PRISM
+        else if (currentStep == 8) // THỰC HÀNH: Prism
         {
-            // Bài Lăng kính: Chỉ cần bắt được tia chớp Lăng kính phân tách 7 màu là ăn điểm
             if (dispersionPrismLaser != null && dispersionPrismLaser.isHittingPrism)
             {
-                AdvanceStepWithDelay(3f);
+                AdvanceStepWithDelay(2f);
             }
         }
     }
@@ -136,19 +126,63 @@ public class ScenarioManager : MonoBehaviour
     {
         if (menuBoardText == null)
             return;
-        isWaitingToAdvance = false; // Reset cờ chờ khi nhảy bài
+        isWaitingToAdvance = false;
 
-        // Tự động phát âm thanh mỗi khi chuyển bước (nếu có)
-        PlayStepAudio();
-
-        // Quản lý Ẩn/Hiện vật thể theo từng Màn
+        // Quản lý Ẩn/Hiện vật thể
         ManageObjectVisibility();
 
+        // Cập nhật nội dung bảng chữ
+        UpdateTextContent();
+
+        // LOGIC MỚI: Đợi Audio xong mới chuyển bước
+        HandleAudioAndSequence();
+    }
+
+    private void HandleAudioAndSequence()
+    {
+        if (scenarioAudioSource == null || stepClips == null || currentStep >= stepClips.Length)
+            return;
+
+        AudioClip currentClip = stepClips[currentStep];
+
+        if (currentClip != null)
+        {
+            // 1. Phát âm thanh
+            scenarioAudioSource.Stop();
+            scenarioAudioSource.clip = currentClip;
+            scenarioAudioSource.Play();
+
+            // 2. Kiểm tra xem bước này có phải là bước tự động chuyển (Lý thuyết) không?
+            // Các bước Lý thuyết: 0, 1, 2, 5, 6, 7, 9
+            // Các bước Thử thách: 3, 4, 8 (Sẽ đợi CheckAutoProgress)
+            bool isTheoryStep = (currentStep != 3 && currentStep != 4 && currentStep != 8);
+
+            if (isTheoryStep)
+            {
+                if (autoAdvanceCoroutine != null)
+                    StopCoroutine(autoAdvanceCoroutine);
+                // Đợi hết chiều dài Audio + 1 giây nghỉ rồi mới AdvanceStep
+                autoAdvanceCoroutine = StartCoroutine(
+                    AutoAdvanceAfterAudio(currentClip.length + 1.0f)
+                );
+            }
+        }
+    }
+
+    IEnumerator AutoAdvanceAfterAudio(float duration)
+    {
+        isWaitingToAdvance = true;
+        yield return new WaitForSeconds(duration);
+        AdvanceStep();
+    }
+
+    void UpdateTextContent()
+    {
         switch (currentStep)
         {
             case 0:
                 menuBoardText.text =
-                    "<b>XIN CHÀO!</b>\nChào mừng bạn đến với phòng thí nghiệm vật lý ánh sáng thực tế ảo (VR).\n\n<i>(Hệ thống tự động tiếp tục sau vài giây...)</i>";
+                    "<b>XIN CHÀO!</b>\nChào mừng bạn đến với phòng thí nghiệm vật lý ánh sáng thực tế ảo (VR).";
                 break;
             case 1:
                 menuBoardText.text =
@@ -187,72 +221,38 @@ public class ScenarioManager : MonoBehaviour
                     "<b>KẾT THÚC BÀI HỌC!</b>\nTuyệt vời! Hoàn hảo!\nBạn đã tự tay thực hành xong bộ thí nghiệm Khúc Xạ, Phản Xạ Toàn Phẩn (TIR) và Tán Sắc Lăng Hình.\nCảm ơn bạn đã trải nghiệm VRStem như một nguyên lý khoa học thực thụ!";
                 break;
         }
-
-        // Tự động đếm giờ để chuyển bước nếu là Lý thuyết
-        if (stepDurations[currentStep] > 0)
-        {
-            if (autoAdvanceCoroutine != null)
-                StopCoroutine(autoAdvanceCoroutine);
-            autoAdvanceCoroutine = StartCoroutine(AutoAdvanceRoutine(stepDurations[currentStep]));
-        }
-    }
-
-    IEnumerator AutoAdvanceRoutine(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        AdvanceStep();
     }
 
     void ManageObjectVisibility()
     {
-        bool showWater = false;
-        bool showButtons = false;
-        bool showPrism = false;
+        bool showWater = (currentStep >= 0 && currentStep <= 5);
+        bool showButtons = (currentStep == 4 || currentStep == 5);
+        bool showPrism = (currentStep >= 6);
+        bool showImage = (
+            currentStep == 1
+            || currentStep == 2
+            || currentStep == 3
+            // || currentStep == 4
+            || currentStep == 5
+            // || currentStep == 6
+            || currentStep == 7
+            || currentStep == 8
+        );
 
-        // Từ Bước 0 đến 3 (Học Khúc Xạ): Chỉ hiện Bể nước + Laser Khúc Xạ
-        if (currentStep >= 0 && currentStep <= 3)
-        {
-            showWater = true;
-            if (mainLaser != null)
-                mainLaser.environmentRefractiveIndex = 1.0f; // Luôn đảm bảo n=1 lúc Học
-        }
-        // Bước 4, 5 (Phản Xạ Toàn Phần): Hiện Bể nước + Hiện Nút bấm hóa chất
-        else if (currentStep == 4 || currentStep == 5)
-        {
-            showWater = true;
-            showButtons = true; // Hiện Nút bấm n=2
-        }
-        // Bước 6 đến 9 (Tán Sắc Cầu Vồng): Ẩn Nước, Ẩn Nút, Hiện Prism + Laser Prism, Reset n=1
-        else if (currentStep >= 6 && currentStep <= 9)
-        {
-            showPrism = true;
-            if (mainLaser != null)
-                mainLaser.environmentRefractiveIndex = 1.0f; // Xả môi trường về n=1
-        }
-
-        // Bật/Tắt các vật thể trên màn hình VR (Nước, Nút bấm, Lăng kính)
         if (targetWaterTank != null)
             targetWaterTank.gameObject.SetActive(showWater);
         if (indexButtonPanel != null)
             indexButtonPanel.gameObject.SetActive(showButtons);
         if (prismObject != null)
             prismObject.gameObject.SetActive(showPrism);
-    }
-
-    // Hàm phụ trợ phát âm thanh cho từng bước
-    private void PlayStepAudio()
-    {
-        if (scenarioAudioSource != null && stepClips != null && currentStep < stepClips.Length)
+        if (image != null)
         {
-            // Dừng âm thanh đang phát (nếu có) để tránh chồng chéo
-            scenarioAudioSource.Stop();
-
-            // Phát âm thanh của bước hiện tại nếu file đó tồn tại
-            if (stepClips[currentStep] != null)
-            {
-                scenarioAudioSource.clip = stepClips[currentStep];
-                scenarioAudioSource.Play();
-            }
+            image.gameObject.SetActive(showImage);
+            image.material.SetTexture("_BaseMap", stepTextures[currentStep]);
         }
+
+        // Reset chiết suất môi trường nếu cần
+        if (mainLaser != null && (currentStep <= 3 || currentStep >= 6))
+            mainLaser.environmentRefractiveIndex = 1.0f;
     }
 }
