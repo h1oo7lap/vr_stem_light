@@ -19,6 +19,13 @@ public class ScenarioManager : MonoBehaviour
     [Tooltip("Kéo cây Laser dùng cho Lăng Kính vào (để check cầu vồng đập vào bảng)")]
     public LightBeamPhysics dispersionPrismLaser;
 
+    [Header("Audio (Lồng tiếng / Thông báo)")]
+    [Tooltip("Kéo AudioSource dùng để phát âm thanh vào đây")]
+    public AudioSource scenarioAudioSource;
+    [Tooltip("Danh sách 10 file âm thanh tương ứng với 10 Case trong switch(currentStep)")]
+    public AudioClip[] stepClips;
+
+
     [Header("Dynamic Objects (Tự động Hiện/Ẩn)")]
     [Tooltip("Lắp Nút bấm đổi chiết suất (hoặc Canvas chứa nút) vào đây để nó tàng hình ở Vòng 1")]
     public GameObject indexButtonPanel;
@@ -125,8 +132,12 @@ public class ScenarioManager : MonoBehaviour
         if (menuBoardText == null) return;
         isWaitingToAdvance = false; // Reset cờ chờ khi nhảy bài
 
+        // Tự động phát âm thanh mỗi khi chuyển bước (nếu có)
+        PlayStepAudio();
+
         // Quản lý Ẩn/Hiện vật thể theo từng Màn
         ManageObjectVisibility();
+
 
         switch (currentStep)
         {
@@ -149,7 +160,7 @@ public class ScenarioManager : MonoBehaviour
                 menuBoardText.text = "<b>GIẢI THÍCH PHẢN XẠ TOÀN PHẦN:</b>\nTuyệt vời! Bạn vừa tự tay tạo ra hiện tượng <b>Phản xạ Toàn phần</b>.\nÁnh sáng bị dội ngược lại như một tấm gương soi do nó muốn đi từ môi trường chiết suất Cao (Khí) sang Thấp (Nước), nhưng lại va đập với ranh giới ở góc quá lớn khiến tia sáng bị dội ngược trở lại.\n(Đây là nguyên lý của cáp quang truyền Internet).";
                 break;
             case 6:
-                menuBoardText.text = "<b>ĐẶT VẤN ĐỀ:</b>\nLại một câu hỏi nữa! Tuyệt vời!\n\nBạn có bao giờ nhìn thấy Cầu vồng lấp lánh xuất hiện sau cơn mưa rào?\nHoặc ánh sáng trắng khi đi qua những con suốt kim cương lăng kính lại tách thành 7 màu lấp lánh?";
+                menuBoardText.text = "<b>ĐẶT VẤN ĐỀ:</b>\nLại một câu hỏi nữa!\n\nBạn có bao giờ nhìn thấy Cầu vồng lấp lánh xuất hiện sau cơn mưa rào?\nHoặc ánh sáng trắng khi đi qua những con suốt kim cương lăng kính lại tách thành 7 màu lấp lánh?";
                 break;
             case 7:
                 menuBoardText.text = "<b>GIẢI THÍCH TÁN SẮC:</b>\nHiện tượng này gọi là <b>Tán sắc ánh sáng</b>.\nÁnh sáng trắng thực chất gồm 7 dải màu gộp lại (Đỏ -> Tím).\nMỗi màu có tần số và mức độ bẻ cong khác nhau: Tím bẻ cong nhiều nhất, Đỏ bẻ cong ít nhất.\n Kết quả: Chúng tách rời nhau ra khỏi dòng tụ tạo thành cầu vồng vạn hoa.";
@@ -206,4 +217,22 @@ public class ScenarioManager : MonoBehaviour
         if (indexButtonPanel != null) indexButtonPanel.gameObject.SetActive(showButtons);
         if (prismObject != null) prismObject.gameObject.SetActive(showPrism);
     }
+
+    // Hàm phụ trợ phát âm thanh cho từng bước
+    private void PlayStepAudio()
+    {
+        if (scenarioAudioSource != null && stepClips != null && currentStep < stepClips.Length)
+        {
+            // Dừng âm thanh đang phát (nếu có) để tránh chồng chéo
+            scenarioAudioSource.Stop();
+
+            // Phát âm thanh của bước hiện tại nếu file đó tồn tại
+            if (stepClips[currentStep] != null)
+            {
+                scenarioAudioSource.clip = stepClips[currentStep];
+                scenarioAudioSource.Play();
+            }
+        }
+    }
 }
+

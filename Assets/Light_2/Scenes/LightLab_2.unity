@@ -3568,6 +3568,18 @@ MonoBehaviour:
   opticVisualAids: {fileID: 1208546836}
   targetWaterTank: {fileID: 1203794408}
   dispersionPrismLaser: {fileID: 2065557974}
+  scenarioAudioSource: {fileID: 358074921}
+  stepClips:
+  - {fileID: 8300000, guid: db7e176bb017b7848a96308e83128d9a, type: 3}
+  - {fileID: 8300000, guid: e6e82f7728db7ee40b3d45aa76cec811, type: 3}
+  - {fileID: 8300000, guid: 96d6132cbb19b5a46a028df900cd4b02, type: 3}
+  - {fileID: 8300000, guid: 04d38e29f7155344897d891d5c38c91d, type: 3}
+  - {fileID: 8300000, guid: 2e7bd7e0c51b8b545a3dad35f3a0a69d, type: 3}
+  - {fileID: 8300000, guid: 169f8a9b2dce63e45a6d21310787fa73, type: 3}
+  - {fileID: 8300000, guid: 96c5a9eefa79f7c408948f68ae51cb92, type: 3}
+  - {fileID: 8300000, guid: 40c4ff2a5d0e79e4ebcb7f858e7b3591, type: 3}
+  - {fileID: 8300000, guid: 95e7a62f187d6814e9bd46f2be4b6ace, type: 3}
+  - {fileID: 8300000, guid: 281c88c4f1f61e44c998c5836fd1d78c, type: 3}
   indexButtonPanel: {fileID: 302096469}
   prismObject: {fileID: 1328724510}
   onStepCompleted:
