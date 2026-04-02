@@ -5,7 +5,7 @@ public class EnvironmentStarter : MonoBehaviour
     public Light sun;
     public Material skyboxMaterial;
     public GameObject menuBoard;
-    public GameObject plane; 
+    public GameObject plane;
     public GameObject hhtiScene;
     public GameObject startButton;
 
@@ -17,11 +17,14 @@ public class EnvironmentStarter : MonoBehaviour
         RenderSettings.ambientLight = Color.black; // Chỉnh ánh sáng môi trường thành màu đen
 
         // 2. Tắt ánh sáng mặt trời
-        if (sun != null) sun.intensity = 0f;
+        if (sun != null)
+            sun.intensity = 0f;
 
         // 3. Ẩn các GameObject
-        if (menuBoard != null) menuBoard.SetActive(false);
-        if (hhtiScene != null) hhtiScene.SetActive(false);
+        if (menuBoard != null)
+            menuBoard.SetActive(false);
+        if (hhtiScene != null)
+            hhtiScene.SetActive(false);
 
         // 4. Ẩn Plane nhưng giữ va chạm
         if (plane != null && plane.GetComponent<MeshRenderer>() != null)
@@ -41,11 +44,14 @@ public class EnvironmentStarter : MonoBehaviour
         }
 
         // 2. Bật ánh sáng mặt trời
-        if (sun != null) sun.intensity = 1f;
+        if (sun != null)
+            sun.intensity = 1f;
 
         // 3. Hiện các đối tượng và Plane
-        if (menuBoard != null) menuBoard.SetActive(true);
-        if (hhtiScene != null) hhtiScene.SetActive(true);
+        if (menuBoard != null)
+            menuBoard.SetActive(true);
+        if (hhtiScene != null)
+            hhtiScene.SetActive(true);
         if (plane != null && plane.GetComponent<MeshRenderer>() != null)
         {
             plane.GetComponent<MeshRenderer>().enabled = true;
@@ -55,6 +61,7 @@ public class EnvironmentStarter : MonoBehaviour
         DynamicGI.UpdateEnvironment();
 
         // 5. Ẩn nút Start
-        if (startButton != null) startButton.SetActive(false);
+        if (startButton != null)
+            startButton.SetActive(false);
     }
 }

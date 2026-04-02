@@ -21,22 +21,27 @@ public class LightBeamPhysics : MonoBehaviour
     [Header("Volumetric Effect (Hiệu ứng ánh sáng)")]
     [Tooltip("Cường độ sáng chói (HDR)")]
     public float glowIntensity = 3.5f;
+
     [Tooltip("Dùng lớp LineRenderer phụ để làm quầng sáng (Halo) bao quanh tia sáng")]
     public bool useVolumetricHalo = true;
     public float haloWidthMultiplier = 4.0f;
+
     [Range(0.01f, 1f)]
     public float haloAlpha = 0.15f;
 
     [Header("Visual Aids & Environment")]
     [Tooltip("Gắn script OpticVisualAids vào đây để hiển thị số đo góc")]
     public OpticVisualAids opticVisualAids;
-    
-    [Tooltip("Chiết suất của Không gian môi trường bên ngoài (Mặc định Không khí n=1.0). Tăng con số này lên vượt qua vật thể để tạo Phản Xạ Toàn Phần.")]
+
+    [Tooltip(
+        "Chiết suất của Không gian môi trường bên ngoài (Mặc định Không khí n=1.0). Tăng con số này lên vượt qua vật thể để tạo Phản Xạ Toàn Phần."
+    )]
     [Range(1.0f, 3.0f)]
     public float environmentRefractiveIndex = 1.0f;
 
     [HideInInspector]
     public bool isDispersionHittingTarget = false; // Trạng thái đập trúng tường
+
     [HideInInspector]
     public bool isHittingPrism = false; // Trạng thái bắn tia phân tách lăng kính
 
@@ -54,11 +59,11 @@ public class LightBeamPhysics : MonoBehaviour
 
     private readonly Color[] rainbowColors = new Color[]
     {
-        new Color(1f, 0f, 0f, 1f),   // Red (Bẻ cong ít nhất -> Nằm ở trên cùng)
+        new Color(1f, 0f, 0f, 1f), // Red (Bẻ cong ít nhất -> Nằm ở trên cùng)
         new Color(1f, 0.5f, 0f, 1f), // Orange
-        new Color(1f, 1f, 0f, 1f),   // Yellow
-        new Color(0f, 1f, 0f, 1f),   // Green
-        new Color(0f, 0f, 1f, 1f),   // Blue
+        new Color(1f, 1f, 0f, 1f), // Yellow
+        new Color(0f, 1f, 0f, 1f), // Green
+        new Color(0f, 0f, 1f, 1f), // Blue
         new Color(0.3f, 0f, 1f, 1f), // Indigo
         new Color(0.8f, 0f, 1f, 1f), // Violet (Bẻ cong gập nhiều nhất -> Nằm ở dưới cùng)
     };
@@ -98,7 +103,7 @@ public class LightBeamPhysics : MonoBehaviour
             GameObject mainHaloObj = new GameObject("MainBeam_Halo");
             mainHaloObj.transform.SetParent(mainLineRenderer.transform);
             mainHaloObj.hideFlags = HideFlags.HideInHierarchy;
-            
+
             mainHaloRenderer = mainHaloObj.AddComponent<LineRenderer>();
             mainHaloRenderer.material = beamMaterial;
             mainHaloRenderer.numCapVertices = 8;
@@ -114,7 +119,7 @@ public class LightBeamPhysics : MonoBehaviour
 
             LineRenderer lr = go.AddComponent<LineRenderer>();
             lr.positionCount = 0;
-            lr.startWidth = lr.endWidth = 0.035f; 
+            lr.startWidth = lr.endWidth = 0.035f;
             lr.material = beamMaterial;
             lr.numCapVertices = 8;
             lr.numCornerVertices = 8;
@@ -181,13 +186,27 @@ public class LightBeamPhysics : MonoBehaviour
                 if (hit.collider.CompareTag("Prism"))
                 {
                     hitPrismThisFrame = true;
-                    
+
                     // 1. Phóng tia sáng Trắng đi khúc xạ xuyên qua lõi Lăng Kính (Chưa tẽ màu)
-                    Vector3 internalDir = Refract(incomingDir, normal, environmentRefractiveIndex, 1.52f).normalized;
+                    Vector3 internalDir = Refract(
+                        incomingDir,
+                        normal,
+                        environmentRefractiveIndex,
+                        1.52f
+                    ).normalized;
 
                     // 2. Dùng tia phụ (đảo ngược) bắn vào vỏ Lăng kính từ bên ngoài để tìm ĐIỂM THOÁT (Exit Point)
-                    Ray prismReverseRay = new Ray(hit.point + internalDir * maxDistance, -internalDir);
-                    if (hit.collider.Raycast(prismReverseRay, out RaycastHit prismExitHit, maxDistance * 2f))
+                    Ray prismReverseRay = new Ray(
+                        hit.point + internalDir * maxDistance,
+                        -internalDir
+                    );
+                    if (
+                        hit.collider.Raycast(
+                            prismReverseRay,
+                            out RaycastHit prismExitHit,
+                            maxDistance * 2f
+                        )
+                    )
                     {
                         // Nối dài tia Trắng (Main Ray) từ mặt Vào đến đúng nốt mặt Thoát
                         mainPoints.Add(prismExitHit.point);
@@ -198,7 +217,7 @@ public class LightBeamPhysics : MonoBehaviour
                         // 3. Tại đúng Điểm Thoát, kích nổ 7 tia màu Tán Sắc bắn xòe ra ngoài không khí
                         SpawnDispersionRaysAtExit(prismExitHit.point, internalDir, exitNormal);
                     }
-                    
+
                     break; // Cắt đứt hoàn toàn tia Trắng tại điểm Thoát, nhường sân khấu vinh quang cho 7 tia Tán sắc
                 }
                 else if (hit.collider.CompareTag("Mirror"))
@@ -206,10 +225,17 @@ public class LightBeamPhysics : MonoBehaviour
                     Vector3 reflectDir = Vector3.Reflect(incomingDir, normal);
                     ray = new Ray(hit.point + reflectDir * 0.001f, reflectDir);
                 }
-                else if (hit.collider.CompareTag("Glass") || hit.collider.CompareTag("Water") || hit.collider.CompareTag("Lens"))
+                else if (
+                    hit.collider.CompareTag("Glass")
+                    || hit.collider.CompareTag("Water")
+                    || hit.collider.CompareTag("Lens")
+                )
                 {
                     RefractiveMaterial rm = hit.collider.GetComponent<RefractiveMaterial>();
-                    float n_object = rm != null ? rm.refractiveIndex : (hit.collider.CompareTag("Glass") ? 1.5f : 1.33f);
+                    float n_object =
+                        rm != null
+                            ? rm.refractiveIndex
+                            : (hit.collider.CompareTag("Glass") ? 1.5f : 1.33f);
 
                     // Xác định chiều chiết suất đi từ Không Gian Ngoài (Môi Trường) -> Vật thể
                     float n1 = environmentRefractiveIndex;
@@ -226,7 +252,13 @@ public class LightBeamPhysics : MonoBehaviour
                     // Gọi Visual Aids vẽ góc khúc xạ chuẩn theo mặt VÀO
                     if (bounceCount == 0 && opticVisualAids != null)
                     {
-                        opticVisualAids.UpdateVisuals(hit.point, incomingDir, normal, refractDir, tirHappened);
+                        opticVisualAids.UpdateVisuals(
+                            hit.point,
+                            incomingDir,
+                            normal,
+                            refractDir,
+                            tirHappened
+                        );
                         showVisualAidsThisFrame = true;
                     }
 
@@ -259,7 +291,7 @@ public class LightBeamPhysics : MonoBehaviour
 
         mainLineRenderer.positionCount = mainPoints.Count;
         mainLineRenderer.SetPositions(mainPoints.ToArray());
-        
+
         // Tăng sáng (HDR Glow) cho tia chính
         Color mainHdr = Color.white * glowIntensity;
         mainHdr.a = 1f; // Giữ nguyên độ đặc
@@ -272,7 +304,7 @@ public class LightBeamPhysics : MonoBehaviour
             mainHaloRenderer.SetPositions(mainPoints.ToArray());
             mainHaloRenderer.startWidth = mainLineRenderer.startWidth * haloWidthMultiplier;
             mainHaloRenderer.endWidth = mainLineRenderer.endWidth * haloWidthMultiplier;
-            
+
             Color haloC = Color.white;
             haloC.a = haloAlpha;
             mainHaloRenderer.startColor = haloC;
@@ -294,7 +326,7 @@ public class LightBeamPhysics : MonoBehaviour
         for (int i = 0; i < 7; i++)
         {
             float n = refractiveIndices[i];
-            
+
             // Tính tia màu thoát ra khỏi lăng kính (Từ môi trường thủy tinh (n) dội ra Không khí (1.0))
             Vector3 exitDir = Refract(internalDir, exitNormal, n, 1.0f).normalized;
 
@@ -325,43 +357,72 @@ public class LightBeamPhysics : MonoBehaviour
                         Vector3 reflect = Vector3.Reflect(currentDir, hitNormal);
                         colorRay = new Ray(colorHit.point + reflect * 0.001f, reflect);
                     }
-                    else if (colorHit.collider.CompareTag("Screen") || colorHit.collider.name.ToLower().Contains("screen"))
+                    else if (
+                        colorHit.collider.CompareTag("Screen")
+                        || colorHit.collider.name.ToLower().Contains("screen")
+                    )
                     {
                         isDispersionHittingTarget = true;
                         break; // Stop raycasting for this color ray after hitting the screen
                     }
                     else if (
-                        colorHit.collider.CompareTag("Prism") ||
-                        colorHit.collider.CompareTag("Glass") ||
-                        colorHit.collider.CompareTag("Water") ||
-                        colorHit.collider.CompareTag("Lens")
+                        colorHit.collider.CompareTag("Prism")
+                        || colorHit.collider.CompareTag("Glass")
+                        || colorHit.collider.CompareTag("Water")
+                        || colorHit.collider.CompareTag("Lens")
                     )
                     {
-                        RefractiveMaterial rm = colorHit.collider.GetComponent<RefractiveMaterial>();
+                        RefractiveMaterial rm =
+                            colorHit.collider.GetComponent<RefractiveMaterial>();
                         float baseN = 1.52f; // Mặc định Prism
-                        if (colorHit.collider.CompareTag("Glass")) baseN = 1.5f;
-                        else if (colorHit.collider.CompareTag("Water")) baseN = 1.33f;
-                        
-                        if (rm != null) baseN = rm.refractiveIndex;
+                        if (colorHit.collider.CompareTag("Glass"))
+                            baseN = 1.5f;
+                        else if (colorHit.collider.CompareTag("Water"))
+                            baseN = 1.33f;
+
+                        if (rm != null)
+                            baseN = rm.refractiveIndex;
 
                         float colorSpecificN = baseN * (n / 1.52f);
 
                         // 1. Entry refraction
-                        Vector3 enterRefractDir = Refract(currentDir, hitNormal, 1.0f, colorSpecificN);
+                        Vector3 enterRefractDir = Refract(
+                            currentDir,
+                            hitNormal,
+                            1.0f,
+                            colorSpecificN
+                        );
 
                         // 2. Backward raycast trick for material exit
-                        Ray revRay = new Ray(colorHit.point + enterRefractDir * maxDistance, -enterRefractDir);
-                        if (colorHit.collider.Raycast(revRay, out RaycastHit exHit, maxDistance * 2f))
+                        Ray revRay = new Ray(
+                            colorHit.point + enterRefractDir * maxDistance,
+                            -enterRefractDir
+                        );
+                        if (
+                            colorHit.collider.Raycast(
+                                revRay,
+                                out RaycastHit exHit,
+                                maxDistance * 2f
+                            )
+                        )
                         {
                             points.Add(exHit.point);
                             Vector3 exNormal = -exHit.normal;
-                            Vector3 exDir = Refract(enterRefractDir, exNormal, colorSpecificN, 1.0f);
+                            Vector3 exDir = Refract(
+                                enterRefractDir,
+                                exNormal,
+                                colorSpecificN,
+                                1.0f
+                            );
                             colorRay = new Ray(exHit.point + exDir * 0.001f, exDir);
                             colorBounce++;
                         }
                         else
                         {
-                            colorRay = new Ray(colorHit.point + enterRefractDir * 0.001f, enterRefractDir);
+                            colorRay = new Ray(
+                                colorHit.point + enterRefractDir * 0.001f,
+                                enterRefractDir
+                            );
                         }
                     }
                     else

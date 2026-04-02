@@ -1,5 +1,5 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class OpticVisualAids : MonoBehaviour
 {
@@ -21,7 +21,13 @@ public class OpticVisualAids : MonoBehaviour
     public float currentAngleR = 0f;
     public bool isTIR = false;
 
-    public void UpdateVisuals(Vector3 hitPoint, Vector3 incomingDir, Vector3 normal, Vector3 refractDir, bool tirHappened = false)
+    public void UpdateVisuals(
+        Vector3 hitPoint,
+        Vector3 incomingDir,
+        Vector3 normal,
+        Vector3 refractDir,
+        bool tirHappened = false
+    )
     {
         isTIR = tirHappened;
         // Vector tia tới (chiều đi từ điểm cắt ngược lên nguồn sáng)
@@ -43,21 +49,22 @@ public class OpticVisualAids : MonoBehaviour
 
         // 2. Tính toán và vẽ vòng cung Góc Tới (i)
         currentAngleI = Vector3.Angle(reverseIncoming, n);
-        if (arcIRenderer != null) 
+        if (arcIRenderer != null)
         {
             DrawArc(arcIRenderer, hitPoint, n, reverseIncoming, arcRadius);
         }
-        
+
         if (textI != null)
         {
-            textI.transform.position = hitPoint + Vector3.Slerp(n, reverseIncoming, 0.5f).normalized * (arcRadius + 0.15f);
+            textI.transform.position =
+                hitPoint + Vector3.Slerp(n, reverseIncoming, 0.5f).normalized * (arcRadius + 0.15f);
             textI.text = $"i = {currentAngleI:F1}°";
-            
+
             // Xoay mặt chữ hướng về Camera người dùng VR
-            if (Camera.main != null) 
+            if (Camera.main != null)
             {
                 textI.transform.LookAt(Camera.main.transform);
-                textI.transform.Rotate(0, 180, 0); 
+                textI.transform.Rotate(0, 180, 0);
             }
 
             // Ép cấu hình TMP để không bị tàng hình do tràn viền (Clipping)
@@ -68,16 +75,18 @@ public class OpticVisualAids : MonoBehaviour
 
         // 3. Tính toán và vẽ vòng cung Góc Khúc Xạ (r) / Góc Phản Xạ
         currentAngleR = Vector3.Angle(refracted, reverseN);
-        if (arcRRenderer != null) 
+        if (arcRRenderer != null)
         {
             DrawArc(arcRRenderer, hitPoint, reverseN, refracted, arcRadius);
         }
 
         if (textR != null)
         {
-            textR.transform.position = hitPoint + Vector3.Slerp(reverseN, refracted, 0.5f).normalized * (arcRadius + 0.15f);
+            textR.transform.position =
+                hitPoint
+                + Vector3.Slerp(reverseN, refracted, 0.5f).normalized * (arcRadius + 0.15f);
             textR.text = isTIR ? $"r' = {currentAngleR:F1}° (TIR)" : $"r = {currentAngleR:F1}°";
-            
+
             if (Camera.main != null)
             {
                 textR.transform.LookAt(Camera.main.transform);
@@ -91,7 +100,13 @@ public class OpticVisualAids : MonoBehaviour
         }
     }
 
-    private void DrawArc(LineRenderer lr, Vector3 center, Vector3 fromDir, Vector3 toDir, float radius)
+    private void DrawArc(
+        LineRenderer lr,
+        Vector3 center,
+        Vector3 fromDir,
+        Vector3 toDir,
+        float radius
+    )
     {
         int segments = 20;
         lr.positionCount = segments + 1;
@@ -109,11 +124,16 @@ public class OpticVisualAids : MonoBehaviour
         currentAngleI = 0f;
         currentAngleR = 0f;
         isTIR = false;
-        
-        if (normalLine != null) normalLine.positionCount = 0;
-        if (arcIRenderer != null) arcIRenderer.positionCount = 0;
-        if (arcRRenderer != null) arcRRenderer.positionCount = 0;
-        if (textI != null) textI.text = "";
-        if (textR != null) textR.text = "";
+
+        if (normalLine != null)
+            normalLine.positionCount = 0;
+        if (arcIRenderer != null)
+            arcIRenderer.positionCount = 0;
+        if (arcRRenderer != null)
+            arcRRenderer.positionCount = 0;
+        if (textI != null)
+            textI.text = "";
+        if (textR != null)
+            textR.text = "";
     }
 }
