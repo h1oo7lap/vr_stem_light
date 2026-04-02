@@ -9,24 +9,22 @@ public class ScenarioManager : MonoBehaviour
     public TMP_Text menuBoardText;
 
     [Header("Dependencies")]
-    public LightBeamPhysics mainLaser;
-    public OpticVisualAids opticVisualAids;
+    public LightPhysics mainLaser;
+    public Visualization visualization;
     public RefractiveMaterial targetWaterTank;
-    public LightBeamPhysics dispersionPrismLaser;
+    public LightPhysics dispersionPrismLaser;
 
-    [Header("Audio (Lồng tiếng)")]
+    [Header("Audio")]
     public AudioSource scenarioAudioSource;
-
-    [Header("Dynamic Objects")]
-    public GameObject indexButtonPanel;
-    public GameObject prismObject;
+    public AudioClip[] stepClips;
 
     [Header("Images")]
     public MeshRenderer image;
     public Texture[] stepTextures;
 
-    [Tooltip("Sounds.")]
-    public AudioClip[] stepClips;
+    [Header("Dynamic Objects")]
+    public GameObject indexButtonPanel;
+    public GameObject prismObject;
 
     [Header("Events")]
     public UnityEvent onStepCompleted;
@@ -75,9 +73,9 @@ public class ScenarioManager : MonoBehaviour
         if (currentStep == 3) // THỬ THÁCH 1: Khúc xạ
         {
             if (
-                opticVisualAids != null
-                && opticVisualAids.currentAngleR >= 35f
-                && opticVisualAids.currentAngleR <= 40f
+                visualization != null
+                && visualization.currentAngleR >= 35f
+                && visualization.currentAngleR <= 40f
             )
             {
                 AdvanceStepWithDelay(1.5f);
@@ -89,7 +87,7 @@ public class ScenarioManager : MonoBehaviour
             {
                 if (
                     mainLaser.environmentRefractiveIndex > targetWaterTank.refractiveIndex
-                    && opticVisualAids.isTIR
+                    && visualization.isTIR
                 )
                 {
                     AdvanceStepWithDelay(2f);

@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class OpticVisualAids : MonoBehaviour
+public class Visualization : MonoBehaviour
 {
     [Header("Line Renderers (Kéo thả vào đây)")]
     public LineRenderer normalLine;

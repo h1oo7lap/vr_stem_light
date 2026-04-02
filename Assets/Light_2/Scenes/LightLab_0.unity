@@ -377,14 +377,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 494292883}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1dfb0b5a07cc0bf488013bbfa664f1a1, type: 3}
+  m_Script: {fileID: 11500000, guid: 221bb5843f28d9946a667622b985a976, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnvironmentStarter
   sun: {fileID: 1552136960}
   skyboxMaterial: {fileID: 2100000, guid: e8e050ebed6e35d4687a2e8f0f6ba0db, type: 2}
   menuBoard: {fileID: 1930341934}
   plane: {fileID: 1378664929}
-  hhtiScene: {fileID: 586422619}
+  hub: {fileID: 586422619}
   startButton: {fileID: 494292883}
 --- !u!65 &494292885
 BoxCollider:

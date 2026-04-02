@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightBeamPhysics : MonoBehaviour
+public class LightPhysics : MonoBehaviour
 {
     [Header("Main Beam Setup")]
     public LineRenderer mainLineRenderer;
@@ -16,7 +16,7 @@ public class LightBeamPhysics : MonoBehaviour
     public Material dispersionBeamMaterial;
 
     [Header("Dispersion Strength")]
-    public float dispersionStrength = 0.05f; // Giảm xuống để dải màu ko bị xòe quá gắt gây gãy khúc
+    public float dispersionStrength = -0.05f; // Giảm xuống để dải màu ko bị xòe quá gắt gây gãy khúc
 
     [Header("Volumetric Effect (Hiệu ứng ánh sáng)")]
     [Tooltip("Cường độ sáng chói (HDR)")]
@@ -30,8 +30,8 @@ public class LightBeamPhysics : MonoBehaviour
     public float haloAlpha = 0.15f;
 
     [Header("Visual Aids & Environment")]
-    [Tooltip("Gắn script OpticVisualAids vào đây để hiển thị số đo góc")]
-    public OpticVisualAids opticVisualAids;
+    [Tooltip("Gắn script visualization vào đây để hiển thị số đo góc")]
+    public Visualization visualization;
 
     [Tooltip(
         "Chiết suất của Không gian môi trường bên ngoài (Mặc định Không khí n=1.0). Tăng con số này lên vượt qua vật thể để tạo Phản Xạ Toàn Phần."
@@ -246,9 +246,9 @@ public class LightBeamPhysics : MonoBehaviour
                     bool tirHappened = Vector3.Dot(refractDir, normal) > 0.001f;
 
                     // Gọi Visual Aids vẽ góc khúc xạ chuẩn theo mặt VÀO
-                    if (bounceCount == 0 && opticVisualAids != null)
+                    if (bounceCount == 0 && visualization != null)
                     {
-                        opticVisualAids.UpdateVisuals(
+                        visualization.UpdateVisuals(
                             hit.point,
                             incomingDir,
                             normal,
@@ -280,9 +280,9 @@ public class LightBeamPhysics : MonoBehaviour
             DisableDispersionRays();
         }
 
-        if (!showVisualAidsThisFrame && opticVisualAids != null)
+        if (!showVisualAidsThisFrame && visualization != null)
         {
-            opticVisualAids.HideVisuals();
+            visualization.HideVisuals();
         }
 
         mainLineRenderer.positionCount = mainPoints.Count;
@@ -352,14 +352,6 @@ public class LightBeamPhysics : MonoBehaviour
                     {
                         Vector3 reflect = Vector3.Reflect(currentDir, hitNormal);
                         colorRay = new Ray(colorHit.point + reflect * 0.001f, reflect);
-                    }
-                    else if (
-                        colorHit.collider.CompareTag("Screen")
-                        || colorHit.collider.name.ToLower().Contains("screen")
-                    )
-                    {
-                        isDispersionHittingTarget = true;
-                        break; // Stop raycasting for this color ray after hitting the screen
                     }
                     else if (
                         colorHit.collider.CompareTag("Prism")

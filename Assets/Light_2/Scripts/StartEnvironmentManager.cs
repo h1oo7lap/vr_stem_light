@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class EnvironmentStarter : MonoBehaviour
+public class StartEnvironmentManager : MonoBehaviour
 {
     public Light sun;
     public Material skyboxMaterial;
     public GameObject menuBoard;
     public GameObject plane;
-    public GameObject hhtiScene;
+    public GameObject hub;
     public GameObject startButton;
 
     private void Start()
@@ -23,8 +23,8 @@ public class EnvironmentStarter : MonoBehaviour
         // 3. Ẩn các GameObject
         if (menuBoard != null)
             menuBoard.SetActive(false);
-        if (hhtiScene != null)
-            hhtiScene.SetActive(false);
+        if (hub != null)
+            hub.SetActive(false);
 
         // 4. Ẩn Plane nhưng giữ va chạm
         if (plane != null && plane.GetComponent<MeshRenderer>() != null)
@@ -50,8 +50,8 @@ public class EnvironmentStarter : MonoBehaviour
         // 3. Hiện các đối tượng và Plane
         if (menuBoard != null)
             menuBoard.SetActive(true);
-        if (hhtiScene != null)
-            hhtiScene.SetActive(true);
+        if (hub != null)
+            hub.SetActive(true);
         if (plane != null && plane.GetComponent<MeshRenderer>() != null)
         {
             plane.GetComponent<MeshRenderer>().enabled = true;

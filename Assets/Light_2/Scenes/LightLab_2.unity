@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 302096471}
   - component: {fileID: 302096470}
   m_Layer: 0
-  m_Name: IndexController
+  m_Name: IndexManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -327,7 +327,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 302096469}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57ed295316774034d97a03805dfaed43, type: 3}
+  m_Script: {fileID: 11500000, guid: e50d55ad91eda0d40b45c6ffd8ae5fa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnvironmentIndexButtonsController
   mainLaser: {fileID: 2065557974}
@@ -362,7 +362,7 @@ GameObject:
   - component: {fileID: 310740001}
   m_Layer: 0
   m_Name: Cube.001_Material.001_0
-  m_TagString: Untagged
+  m_TagString: Water
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2538,7 +2538,7 @@ GameObject:
   - component: {fileID: 1208546837}
   - component: {fileID: 1208546836}
   m_Layer: 0
-  m_Name: ' OpticVisualAids'
+  m_Name: VisualizationManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2553,7 +2553,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1208546835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34cf861db84f038468538b06c1f61228, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a0aaf332e2beda429c6970e645474eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OpticVisualAids
   normalLine: {fileID: 599689051}
@@ -2561,7 +2561,7 @@ MonoBehaviour:
   arcRRenderer: {fileID: 871885925}
   textI: {fileID: 885737658}
   textR: {fileID: 720881224}
-  normalLength: 1.5
+  normalLength: 2
   arcRadius: 0.25
   currentAngleI: 0
   currentAngleR: 0
@@ -2788,7 +2788,7 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 548611188}
-  m_Father: {fileID: 1441409303}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3528,7 +3528,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1242366703}
   - {fileID: 358074922}
   - {fileID: 1208546837}
   - {fileID: 302096471}
@@ -3548,24 +3547,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScenarioManager
   menuBoardText: {fileID: 1242366701}
   mainLaser: {fileID: 2065557974}
-  opticVisualAids: {fileID: 1208546836}
+  visualization: {fileID: 1208546836}
   targetWaterTank: {fileID: 1203794408}
   dispersionPrismLaser: {fileID: 2065557974}
   scenarioAudioSource: {fileID: 358074921}
-  indexButtonPanel: {fileID: 302096469}
-  prismObject: {fileID: 1328724510}
-  image: {fileID: 1751998530}
-  stepTextures:
-  - {fileID: 0}
-  - {fileID: 2800000, guid: aa994f8aa8ec59e4fa42e86f7af744b1, type: 3}
-  - {fileID: 2800000, guid: fb29c1fc4140b374296ffa87276c3363, type: 3}
-  - {fileID: 2800000, guid: fb29c1fc4140b374296ffa87276c3363, type: 3}
-  - {fileID: 0}
-  - {fileID: 2800000, guid: 013abb4b4d4ec164eaef6da3d97b0cf3, type: 3}
-  - {fileID: 0}
-  - {fileID: 2800000, guid: f62813c3b316679499984d977c872645, type: 3}
-  - {fileID: 2800000, guid: f62813c3b316679499984d977c872645, type: 3}
-  - {fileID: 0}
   stepClips:
   - {fileID: 8300000, guid: db7e176bb017b7848a96308e83128d9a, type: 3}
   - {fileID: 8300000, guid: e6e82f7728db7ee40b3d45aa76cec811, type: 3}
@@ -3577,6 +3562,20 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 40c4ff2a5d0e79e4ebcb7f858e7b3591, type: 3}
   - {fileID: 8300000, guid: 95e7a62f187d6814e9bd46f2be4b6ace, type: 3}
   - {fileID: 8300000, guid: 281c88c4f1f61e44c998c5836fd1d78c, type: 3}
+  image: {fileID: 1751998530}
+  stepTextures:
+  - {fileID: 0}
+  - {fileID: 2800000, guid: aa994f8aa8ec59e4fa42e86f7af744b1, type: 3}
+  - {fileID: 2800000, guid: 75bc4c5e26f2915489ba71af5012b4c6, type: 3}
+  - {fileID: 2800000, guid: fb29c1fc4140b374296ffa87276c3363, type: 3}
+  - {fileID: 0}
+  - {fileID: 2800000, guid: 013abb4b4d4ec164eaef6da3d97b0cf3, type: 3}
+  - {fileID: 0}
+  - {fileID: 2800000, guid: a41dc59823199224b9a38e26f9d73d05, type: 3}
+  - {fileID: 2800000, guid: f62813c3b316679499984d977c872645, type: 3}
+  - {fileID: 0}
+  indexButtonPanel: {fileID: 302096469}
+  prismObject: {fileID: 1328724510}
   onStepCompleted:
     m_PersistentCalls:
       m_Calls: []
@@ -3778,13 +3777,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751998528}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.27059805, y: -0.6532815, z: 0.6532815, w: -0.27059805}
+  m_LocalRotation: {x: -0.25927424, y: -0.67952067, z: 0.62594336, w: -0.2814667}
   m_LocalPosition: {x: -2.0887, y: 1, z: 2.9113}
-  m_LocalScale: {x: 0.175, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0.17500004, y: 0.20000002, z: 0.20000008}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: -45, z: 180}
+  m_LocalEulerAnglesHint: {x: 94.70001, y: -45, z: 180}
 --- !u!1001 &1835752068
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4639,9 +4638,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2065557966}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79e5d1d11864dcf408c96208297a1f1f, type: 3}
+  m_Script: {fileID: 11500000, guid: fba4568e9b23ad04482ff1fce8c005f7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LightBeamPhysics
+  m_EditorClassIdentifier: Assembly-CSharp::LightPhysics
   mainLineRenderer: {fileID: 2065557972}
   startPoint: {fileID: 1265954156}
   maxInteractions: 10
@@ -4652,7 +4651,7 @@ MonoBehaviour:
   useVolumetricHalo: 1
   haloWidthMultiplier: 4
   haloAlpha: 0.15
-  opticVisualAids: {fileID: 1208546836}
+  visualization: {fileID: 1208546836}
   environmentRefractiveIndex: 1
   isDispersionHittingTarget: 0
   isHittingPrism: 0
@@ -4861,4 +4860,5 @@ SceneRoots:
   - {fileID: 979877872}
   - {fileID: 1441409303}
   - {fileID: 1358537624}
+  - {fileID: 1242366703}
   - {fileID: 1751998532}
