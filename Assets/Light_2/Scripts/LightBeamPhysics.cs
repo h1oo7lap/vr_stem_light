@@ -225,11 +225,7 @@ public class LightBeamPhysics : MonoBehaviour
                     Vector3 reflectDir = Vector3.Reflect(incomingDir, normal);
                     ray = new Ray(hit.point + reflectDir * 0.001f, reflectDir);
                 }
-                else if (
-                    hit.collider.CompareTag("Glass")
-                    || hit.collider.CompareTag("Water")
-                    || hit.collider.CompareTag("Lens")
-                )
+                else if (hit.collider.CompareTag("Water"))
                 {
                     RefractiveMaterial rm = hit.collider.GetComponent<RefractiveMaterial>();
                     float n_object =
@@ -367,9 +363,7 @@ public class LightBeamPhysics : MonoBehaviour
                     }
                     else if (
                         colorHit.collider.CompareTag("Prism")
-                        || colorHit.collider.CompareTag("Glass")
                         || colorHit.collider.CompareTag("Water")
-                        || colorHit.collider.CompareTag("Lens")
                     )
                     {
                         RefractiveMaterial rm =
